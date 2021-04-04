@@ -1,4 +1,4 @@
-FROM debian:9.2
+FROM ubuntu
 
 LABEL maintainer "opsxcq@strm.sh"
 
@@ -8,8 +8,11 @@ RUN apt-get update && \
     debconf-utils && \
     echo mariadb-server mysql-server/root_password password vulnerables | debconf-set-selections && \
     echo mariadb-server mysql-server/root_password_again password vulnerables | debconf-set-selections && \
+    DEBIAN_FRONTEND=noninteractive apt remove netcat --purge -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     apache2 \
+    ncat \
+    net-tools \
     mariadb-server \
     php \
     php-mysql \
@@ -22,6 +25,7 @@ RUN apt-get update && \
 
 COPY php.ini /etc/php5/apache2/php.ini
 COPY dvwa /var/www/html
+RUN ln -s /var/www/html/vulnerabilities /var/www/html/dvwa/vulnerabilities
 
 COPY config.inc.php /var/www/html/config/
 
